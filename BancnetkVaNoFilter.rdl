@@ -1,0 +1,26 @@
+SELECT
+  Racks.RackName
+  ,Source.Name
+  ,AVG(DataLog2.[Value]) AS DailyAvgkVaNoFilter
+  ,AVG(DataLog2.[Value])*0.9*24*1.5 AS DailyAvgkWhNoFilter
+  ,SUBSTRING(DATENAME(m,DataLog2.[TimestampUTC]),1,3) as MonthFull
+  ,MONTH(DataLog2.[TimestampUTC]) AS Month
+  ,YEAR(DataLog2.[TimestampUTC]) AS Year
+  ,DAY(EOMONTH(CONVERT(DATE, CONCAT(YEAR(DataLog2.[TimestampUTC]), '-', MONTH(DataLog2.[TimestampUTC]), '-01')))) as NumberOfDays
+FROM
+  Racks
+  INNER JOIN Source
+    ON Racks.Name = Source.Name
+  INNER JOIN DataLog2
+    ON Source.ID = DataLog2.SourceID
+  INNER JOIN Quantity
+    ON Quantity.ID = DataLog2.QuantityID
+WHERE
+  Quantity.Name LIKE N'Apparent Power'
+GROUP BY
+  Racks.RackName
+  ,Source.Name
+  ,SUBSTRING(DATENAME(m,DataLog2.[TimestampUTC]),1,3)
+  ,MONTH(DataLog2.[TimestampUTC])
+  ,YEAR(DataLog2.[TimestampUTC])
+  ,DAY(EOMONTH(CONVERT(DATE, CONCAT(YEAR(DataLog2.[TimestampUTC]), '-', MONTH(DataLog2.[TimestampUTC]), '-01'))))
