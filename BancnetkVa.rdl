@@ -1,0 +1,19 @@
+SELECT
+  Racks.RackName
+  ,Source.Name
+  ,AVG(DataLog2.[Value]) AS Avg_Value
+FROM
+  Racks
+  INNER JOIN Source
+    ON Racks.Name = Source.Name
+  INNER JOIN DataLog2
+    ON Source.ID = DataLog2.SourceID
+  INNER JOIN Quantity
+    ON Quantity.ID = DataLog2.QuantityID
+WHERE
+  Quantity.Name LIKE N'Apparent Power'
+  AND DataLog2.TimestampUTC >= @StartTimestampUTC
+  AND DataLog2.TimestampUTC <= @EndTimestampUTC
+GROUP BY
+  Racks.RackName
+  ,Source.Name
